@@ -1,0 +1,617 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *\
+   Tokens
+\* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --ink: 6 6 6;
+    --bone: 236 231 221;
+    --ember: 208 52 44;
+
+    /* Config defaults (overridable at runtime from src/config/site.ts through
+       the `--cfg-*` channel below). The mobile media query further down
+       re-composes these, and always wins. */
+    --hero-figure-scale: var(--cfg-figure-scale, 1.16);
+    --hero-figure-x: var(--cfg-figure-x, 50%);
+    --hero-figure-y: var(--cfg-figure-y, 34%);
+    --hero-mark-width: var(--cfg-mark-width, 42vw);
+    --hero-mark-top: var(--cfg-mark-top, 50%);
+
+    --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-swift: cubic-bezier(0.4, 0, 0.2, 1);
+
+    color-scheme: dark;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* No scroll hijacking anywhere on the page. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-ink font-sans text-bone antialiased;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(var(--bone) / 0.92);
+    color: rgb(var(--ink));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--bone) / 0.9);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Respect the OS-level motion preference everywhere. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *\
+   Typography primitives
+\* ------------------------------------------------------------------ */
+@layer components {
+  .u-display {
+    font-family: Anton, 'Arial Black', Helvetica, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.84;
+    letter-spacing: -0.02em;
+  }
+
+  .u-headline {
+    font-family: 'Archivo Variable', Archivo, Helvetica, Arial, sans-serif;
+    font-weight: 800;
+    font-stretch: 108%;
+    letter-spacing: -0.035em;
+    line-height: 0.94;
+  }
+
+  .u-label {
+    font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .u-label--tight {
+    letter-spacing: 0.22em;
+  }
+
+  .u-body {
+    @apply text-bone-dim;
+    font-size: clamp(0.95rem, 0.86rem + 0.35vw, 1.075rem);
+    line-height: 1.68;
+  }
+
+  /* Hairline rules used throughout the editorial layout */
+  .rule {
+    @apply block h-px w-full bg-bone/15;
+  }
+
+  /* The outline button used for SHOP and every shopping action. */
+  .btn-outline {
+    @apply relative inline-flex items-center justify-center gap-3 overflow-hidden border border-bone/30 px-7 py-3.5;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgb(var(--bone));
+    transition:
+      color 0.5s var(--ease-editorial),
+      border-color 0.5s var(--ease-editorial);
+    isolation: isolate;
+  }
+
+  .btn-outline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(var(--bone));
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-editorial);
+  }
+
+  .btn-outline:hover,
+  .btn-outline:focus-visible {
+    color: rgb(var(--ink));
+    border-color: rgb(var(--bone));
+  }
+
+  .btn-outline:hover::before,
+  .btn-outline:focus-visible::before {
+    transform: translateY(0);
+  }
+
+  .btn-outline--onLight {
+    @apply border-ink/70 text-ink;
+  }
+  .btn-outline--onLight::before {
+    background: rgb(var(--ink));
+  }
+  .btn-outline--onLight:hover,
+  .btn-outline--onLight:focus-visible {
+    color: rgb(var(--bone));
+    border-color: rgb(var(--ink));
+  }
+
+  .btn-solid {
+    @apply relative inline-flex items-center justify-center gap-3 overflow-hidden border border-bone bg-bone px-7 py-3.5 text-ink;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    transition:
+      background-color 0.5s var(--ease-editorial),
+      color 0.5s var(--ease-editorial);
+  }
+  .btn-solid:hover,
+  .btn-solid:focus-visible {
+    background: rgb(var(--ember));
+    border-color: rgb(var(--ember));
+    color: rgb(var(--bone));
+  }
+
+  .link-underline {
+    @apply relative inline-block;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease-editorial);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ------------------------------------------------------------------ *\
+   Hero layer system
+\* ------------------------------------------------------------------ */
+@layer components {
+  .hero-stage {
+    position: relative;
+    height: 100svh;
+    min-height: 40rem;
+    width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    perspective: 1400px;
+    perspective-origin: 50% 46%;
+    background: #060606;
+  }
+
+  /* Layer 0 — always-on atmospheric wash (works with or without WebGL). */
+  .hero-wash {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(60% 45% at 50% 34%, rgb(var(--bone) / 0.1) 0%, transparent 62%),
+      radial-gradient(110% 80% at 50% 108%, rgb(var(--bone) / 0.055) 0%, transparent 60%),
+      radial-gradient(140% 100% at 50% 50%, transparent 42%, #060606 96%);
+    pointer-events: none;
+  }
+
+  /* Layer 1 — the figure BEHIND the mark. */
+  .hero-figure {
+    position: absolute;
+    inset: -6% -4%;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: var(--hero-figure-x) var(--hero-figure-y);
+    transform: scale(var(--hero-figure-scale));
+    transform-origin: 50% 42%;
+    will-change: transform, opacity;
+    filter: saturate(0) contrast(1.06) brightness(1.05);
+    pointer-events: none;
+  }
+
+  .hero-figure::after {
+    /* Feather the frame edges so the plate melts into the page. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, #060606 0%, transparent 16%, transparent 62%, #060606 99%),
+      linear-gradient(to right, #060606 0%, transparent 12%, transparent 88%, #060606 100%);
+  }
+
+  /* Layer 4 — the same figure, screened back OVER the mark so shoulders and
+     head genuinely interlace with the letterforms instead of sitting flat
+     behind them. Screen blending means only lit pixels reappear. */
+  .hero-figure--interlace {
+    z-index: 4;
+    mix-blend-mode: screen;
+    opacity: 0.55;
+    filter: saturate(0) contrast(1.24) brightness(1.14) blur(0.4px);
+    /* A wide, shallow band centred on the shoulder line: only the parts of the
+       body that actually cross the mark are screened back over it. */
+    -webkit-mask-image: radial-gradient(
+      54% 20% at 50% 54%,
+      #000 0%,
+      rgba(0, 0, 0, 0.75) 48%,
+      transparent 82%
+    );
+    mask-image: radial-gradient(
+      54% 20% at 50% 54%,
+      #000 0%,
+      rgba(0, 0, 0, 0.75) 48%,
+      transparent 82%
+    );
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+  }
+
+  .hero-figure--interlace::after {
+    display: none;
+  }
+
+  /* Layer 5 — film grain + scanline texture. */
+  .hero-grain {
+    position: absolute;
+    inset: -50%;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    animation: grain-drift 5.6s steps(6) infinite;
+  }
+
+  .hero-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 92% at 50% 46%, transparent 34%, rgb(6 6 6 / 0.62) 78%, #060606 100%),
+      linear-gradient(to bottom, rgb(6 6 6 / 0.72) 0%, transparent 22%, transparent 72%, #060606 100%);
+  }
+
+  .atmosphere-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.85;
+  }
+}
+
+@keyframes grain-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-3%, 2%, 0); }
+  40% { transform: translate3d(2%, -3%, 0); }
+  60% { transform: translate3d(-2%, -2%, 0); }
+  80% { transform: translate3d(3%, 1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ------------------------------------------------------------------ *\
+   Reveal primitives (used with GSAP; safe defaults when JS is absent)
+\* ------------------------------------------------------------------ */
+@layer utilities {
+  .reveal-line {
+    display: block;
+    overflow: hidden;
+  }
+  .reveal-line > span {
+    display: block;
+    will-change: transform;
+  }
+
+  .clip-reveal {
+    clip-path: inset(0 0 100% 0);
+    will-change: clip-path;
+  }
+
+  .u-fluid-gutter {
+    padding-inline: clamp(1.25rem, 5vw, 5.5rem);
+  }
+
+  .u-stack-section {
+    @apply u-fluid-gutter;
+    padding-block: clamp(5rem, 12vh, 11rem);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *\
+   Brand symbol
+\* ------------------------------------------------------------------ */
+@layer components {
+  .brand-symbol__sheen {
+    animation: sheen-sweep 9s var(--ease-editorial) 1.4s infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes sheen-sweep {
+  0% {
+    transform: translateX(0);
+  }
+  38% {
+    transform: translateX(880px);
+  }
+  100% {
+    transform: translateX(880px);
+  }
+}
+
+/* ------------------------------------------------------------------ *\
+   Hero composition layers
+\* ------------------------------------------------------------------ */
+@layer components {
+  .hero-figure {
+    transform: translate3d(
+        calc(var(--hero-px, 0px) + var(--hero-shift-x, 0px)),
+        calc(var(--hero-py, 0px) + var(--hero-shift-y, 0px)),
+        0
+      )
+      scale(var(--hero-figure-scale));
+  }
+
+  .hero-figure--interlace {
+    transform: translate3d(
+        calc(var(--hero-px, 0px) * 1.4 + var(--hero-shift-x, 0px)),
+        calc(var(--hero-py, 0px) * 1.4 + var(--hero-shift-y, 0px)),
+        0
+      )
+      scale(calc(var(--hero-figure-scale) * 1.015));
+  }
+
+  .hero-figure > picture {
+    display: contents;
+  }
+
+  .hero-figure__media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: var(--hero-figure-x) var(--hero-figure-y);
+  }
+
+  /* Anchor owns placement only, so GSAP/canvas never fight over transforms. */
+  .hero-mark-anchor {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: var(--hero-mark-top);
+    width: var(--hero-mark-width);
+    margin-left: calc(var(--hero-mark-width) / -2);
+    transform: translateY(-50%);
+    perspective: 1200px;
+    pointer-events: none;
+  }
+
+  .hero-mark-tilt {
+    transform: rotateX(var(--hero-rx, 0deg)) rotateY(var(--hero-ry, 0deg));
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .hero-mark-scale {
+    will-change: transform, opacity;
+  }
+
+  .hero-mark-shadow {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -6%;
+    height: 12%;
+    background: radial-gradient(50% 50% at 50% 50%, rgb(0 0 0 / 0.75) 0%, transparent 72%);
+    filter: blur(10px);
+    z-index: -1;
+  }
+
+  .hero-frame {
+    position: absolute;
+    z-index: 8;
+    inset: clamp(1rem, 3.4vw, 3.25rem) clamp(1rem, 3.4vw, 3.25rem);
+    pointer-events: none;
+  }
+
+  .hero-frame__border {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgb(var(--bone) / 0.13);
+  }
+
+  .hero-frame__tick {
+    position: absolute;
+    width: clamp(14px, 1.5vw, 24px);
+    height: clamp(14px, 1.5vw, 24px);
+    border: 0 solid rgb(var(--bone) / 0.62);
+  }
+  .hero-frame__tick--tl {
+    top: -1px;
+    left: -1px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .hero-frame__tick--tr {
+    top: -1px;
+    right: -1px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+  }
+  .hero-frame__tick--bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+  .hero-frame__tick--br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+
+  .hero-copy {
+    position: absolute;
+    z-index: 9;
+    inset: auto 0 0 0;
+    padding-inline: clamp(1.25rem, 5vw, 5.5rem);
+    padding-bottom: clamp(1.75rem, 4.5vh, 3.75rem);
+  }
+
+  .hero-scrollcue {
+    position: absolute;
+    z-index: 9;
+    left: 50%;
+    bottom: clamp(1.25rem, 3vh, 2.25rem);
+    transform: translateX(-50%);
+  }
+
+  .hero-eyebrow {
+    position: absolute;
+    z-index: 9;
+    top: clamp(6.5rem, 15vh, 9.5rem);
+    left: clamp(1.25rem, 5vw, 5.5rem);
+    right: clamp(1.25rem, 5vw, 5.5rem);
+  }
+}
+
+/* Mobile re-composition: the figure and mark are re-staged, not just shrunk. */
+@media (max-width: 767px) {
+  :root {
+    --hero-figure-scale: 1.09;
+    --hero-figure-x: 50%;
+    --hero-figure-y: 34%;
+    --hero-shift-y: 4vh;
+    --hero-mark-width: 68vw;
+    --hero-mark-top: 47%;
+  }
+  .hero-figure {
+    inset: -4% -18%;
+  }
+  .hero-figure--interlace {
+    opacity: 0.45;
+    -webkit-mask-image: radial-gradient(
+      62% 17% at 50% 52%,
+      #000 0%,
+      rgba(0, 0, 0, 0.75) 48%,
+      transparent 82%
+    );
+    mask-image: radial-gradient(
+      62% 17% at 50% 52%,
+      #000 0%,
+      rgba(0, 0, 0, 0.75) 48%,
+      transparent 82%
+    );
+  }
+}
+
+@media (min-width: 1800px) {
+  :root {
+    --hero-mark-width: 38vw;
+  }
+}
+
+@layer components {
+  .hero-figure-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+}
+
+/* ------------------------------------------------------------------ *\
+   Short-viewport guards — keep the mark clear of the hero copy without
+   ever hijacking the scroll.
+\* ------------------------------------------------------------------ */
+@media (min-width: 768px) and (max-height: 880px) {
+  :root {
+    --hero-mark-top: 52%;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 780px) {
+  :root {
+    --hero-mark-width: min(38vw, 100vh);
+    --hero-mark-top: 50%;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 680px) {
+  :root {
+    --hero-mark-width: min(32vw, 86vh);
+    --hero-mark-top: 47%;
+  }
+}
+
+@media (max-height: 620px) {
+  .hero-copy {
+    padding-bottom: 1.25rem;
+  }
+  .hero-eyebrow {
+    top: 5.25rem;
+  }
+}
+
+/* Landscape phones */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --hero-mark-width: 40vw;
+    --hero-mark-top: 46%;
+    --hero-figure-scale: 1.02;
+  }
+  .hero-scrollcue {
+    display: none !important; /* beats the md:block utility */
+  }
+}
