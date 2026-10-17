@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Faith Over Fear RW">
+  <title>Faith Over Fear RW — F greater than F</title>
+  <rect width="64" height="64" fill="#060606" />
+  <g transform="translate(4 16.4) scale(0.1573)" fill="#ece7dd">
+    <path d="M10,25 H140 V62 H54 V90 H124 V122 H54 V175 H10 Z" />
+    <path d="M10,25 H140 V62 H54 V90 H124 V122 H54 V175 H10 Z" transform="translate(206 0)" />
+    <path d="M150,58 L182,100 L150,142 L172,142 L204,100 L172,58 Z" />
+  </g>
+</svg>
