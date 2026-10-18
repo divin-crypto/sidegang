@@ -1,58 +1,48 @@
-import { useCallback, useEffect, useState } from 'react';
-import SiteNavigation from './components/SiteNavigation';
-import HeroSection from './components/HeroSection';
-import BrandStatement from './components/BrandStatement';
-import ProductShowcase from './components/ProductShowcase';
-import CampaignSection from './components/CampaignSection';
-import BrandStory from './components/BrandStory';
-import CollectionCTA from './components/CollectionCTA';
-import SiteFooter from './components/SiteFooter';
-import { useCatalog } from './data/useCatalog';
-import { heroMedia } from './config/site';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Shop from './pages/Shop';
+import Collections from './pages/Collections';
+import CollectionDetail from './pages/CollectionDetail';
+import ProductDetail from './pages/ProductDetail';
+import Lookbook from './pages/Lookbook';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import Shipping from './pages/Shipping';
+import Returns from './pages/Returns';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Search from './pages/Search';
+import CartPage from './pages/CartPage';
+import NotFound from './pages/NotFound';
 
-/** Publish the hero composition config to CSS (see `--cfg-*` in index.css). */
-function CompositionVars() {
-  const { composition } = heroMedia;
-  return (
-    <style>{`:root{--cfg-figure-scale:${composition.scale};--cfg-figure-x:${composition.focusX};--cfg-figure-y:${composition.focusY};--cfg-mark-width:${composition.markWidthVw}vw;--cfg-mark-top:${composition.markCenterY}%}`}</style>
-  );
-}
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { path: '/', element: <Home /> },
+      { path: '/shop', element: <Shop /> },
+      { path: '/collections', element: <Collections /> },
+      { path: '/collections/:slug', element: <CollectionDetail /> },
+      { path: '/product/:slug', element: <ProductDetail /> },
+      { path: '/lookbook', element: <Lookbook /> },
+      { path: '/about', element: <About /> },
+      { path: '/contact', element: <Contact /> },
+      { path: '/faq', element: <FAQ /> },
+      { path: '/shipping', element: <Shipping /> },
+      { path: '/returns', element: <Returns /> },
+      { path: '/privacy', element: <Privacy /> },
+      { path: '/terms', element: <Terms /> },
+      { path: '/search', element: <Search /> },
+      { path: '/cart', element: <CartPage /> },
+      // legacy anchors
+      { path: '/collections/all', element: <Navigate to="/collections" replace /> },
+      { path: '*', element: <NotFound /> },
+    ],
+  },
+]);
 
 export default function App() {
-  const { products, live } = useCatalog();
-  const [heroReady, setHeroReady] = useState(false);
-
-  const onHeroReady = useCallback(() => setHeroReady(true), []);
-
-  // Hard ceiling: the veil never traps the page, even if a frame never lands.
-  useEffect(() => {
-    const t = window.setTimeout(() => setHeroReady(true), 3500);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  // Lift the loading veil.
-  useEffect(() => {
-    if (!heroReady) return;
-    const veil = document.getElementById('boot-veil');
-    if (!veil) return;
-    veil.classList.add('is-out');
-    const t = window.setTimeout(() => veil.remove(), 1000);
-    return () => window.clearTimeout(t);
-  }, [heroReady]);
-
-  return (
-    <>
-      <CompositionVars />
-      <SiteNavigation />
-      <main id="main">
-        <HeroSection onReady={onHeroReady} />
-        <BrandStatement />
-        <ProductShowcase products={products} live={live} />
-        <CampaignSection />
-        <BrandStory />
-        <CollectionCTA />
-      </main>
-      <SiteFooter />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }

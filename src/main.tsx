@@ -10,13 +10,16 @@ import '@fontsource/space-mono/700.css';
 
 import './index.css';
 import App from './App';
+import { CartProvider } from './context/CartContext';
 
 const container = document.getElementById('root');
 
 if (container) {
   ReactDOM.createRoot(container).render(
     <React.StrictMode>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
     </React.StrictMode>,
   );
 }

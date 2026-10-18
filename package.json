@@ -6,7 +6,7 @@
   "description": "FAITH OVER FEAR RW — immersive landing experience for the Rwandan faith-inspired streetwear brand.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/generate-sitemap.mjs && tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit"
@@ -21,6 +21,7 @@
     "gsap": "^3.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
     "three": "^0.186.1"
   },
   "devDependencies": {
