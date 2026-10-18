@@ -6,10 +6,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    // The sandbox preview is served through a proxied host name; allow it
-    // explicitly so HMR / websockets are not rejected during review.
     allowedHosts: true,
-cors: true,
+    cors: true,
   },
   preview: {
     host: '0.0.0.0',
@@ -24,6 +22,7 @@ cors: true,
       output: {
         manualChunks: {
           motion: ['gsap'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
         },
       },
     },

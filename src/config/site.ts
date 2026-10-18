@@ -98,18 +98,18 @@ export const site = {
 
   hero: {
     eyebrow: 'FAITH OVER FEAR RW — EST. KIGALI',
-    headline: ['WALK BY FAITH.', 'LIVE WITHOUT FEAR.'],
+    headline: ['WALK BY FAITH.', 'LIVE WITH COURAGE.'],
     support: 'Wear your conviction. Move with purpose.',
-    primaryCta: { label: 'EXPLORE THE COLLECTION', href: '#collection' },
+    primaryCta: { label: 'SHOP THE COLLECTION', href: '#collection' },
     secondaryCta: { label: 'OUR PURPOSE', href: '#purpose' },
     scrollHint: 'SCROLL',
   },
 
   nav: {
     links: [
-      { label: 'Collections', href: '#collection' },
-      { label: 'Our Story', href: '#purpose' },
-      { label: 'Contact', href: '#contact' },
+      { label: 'Collection', href: '#collection' },
+      { label: 'Campaign', href: '#campaign' },
+      { label: 'Purpose', href: '#purpose' },
     ],
     shop: { label: 'SHOP', href: `${STORE_ORIGIN}/shop` },
   },

@@ -5,22 +5,34 @@ export default {
     extend: {
       colors: {
         ink: {
-          DEFAULT: '#060606',
+          DEFAULT: '#0A0A0A',
           800: '#0b0b0b',
           700: '#121211',
           600: '#1a1a18',
+          graphite: '#0A0A0A',
         },
         bone: {
-          DEFAULT: '#ece7dd',
+          DEFAULT: '#F5F5F7',
           dim: '#b8b2a6',
           mute: '#8b8578',
           faint: '#57534c',
+          offwhite: '#F5F5F7',
         },
+        paper: '#FFFFFF',
+        graphite: '#0A0A0A',
+        stone: '#7E7E80',
+        titanium: {
+          DEFAULT: '#c2bfbb',
+          light: '#e8e6e3',
+          mid: '#a8a5a1',
+          dark: '#7E7E80',
+        },
+        boneLegacy: '#ece7dd',
         ember: {
           DEFAULT: '#d0342c',
           soft: '#e2564a',
         },
-        line: 'rgba(236,231,221,0.14)',
+        line: 'rgba(245,245,247,0.14)',
       },
       fontFamily: {
         display: ['Anton', 'Archivo Expanded', '"Arial Black"', 'Helvetica', 'sans-serif'],
