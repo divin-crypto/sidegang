@@ -8,7 +8,7 @@ export default function SiteNavigation() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => setScrolled(window.scrollY > 36);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -28,7 +28,6 @@ export default function SiteNavigation() {
     };
   }, [open]);
 
-  // Close the sheet if the viewport grows past the mobile breakpoint.
   useEffect(() => {
     if (!open) return;
     const mq = window.matchMedia('(min-width: 768px)');
@@ -48,59 +47,56 @@ export default function SiteNavigation() {
 
       <header
         className={cx(
-          'fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color,padding] duration-500',
+          'fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color,padding] duration-700 ease-editorial',
           scrolled || open
-            ? 'border-b border-bone/10 bg-ink/72 py-3 backdrop-blur-xl'
-            : 'border-b border-transparent bg-transparent py-5 md:py-6',
+            ? 'border-b border-bone/[0.08] bg-ink/80 py-3.5 backdrop-blur-[18px] backdrop-saturate-[1.2]'
+            : 'border-b border-transparent bg-transparent py-5 md:py-7',
         )}
       >
-        <nav
-          className="u-fluid-gutter flex items-center justify-between gap-6"
-          aria-label="Primary"
-        >
-          {/* ---- wordmark ---- */}
-          <a
-            href="#hero"
-            className="group flex items-center gap-3 text-bone"
-            aria-label={`${site.name} — home`}
-          >
-            <span className="block w-11 shrink-0 transition-transform duration-500 ease-editorial group-hover:-translate-y-0.5 md:w-12">
+        <nav className="u-fluid-gutter flex items-center justify-between gap-6" aria-label="Primary">
+          {/* Wordmark — monolithic, architectural */}
+          <a href="#hero" className="group flex items-center gap-3.5 text-bone" aria-label={`${site.name} — home`}>
+            <span className="block w-[44px] shrink-0 transition-all duration-700 ease-editorial group-hover:-translate-y-[1px] md:w-[48px]">
               <BrandSymbol quiet />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="u-label u-label--tight block text-[0.58rem] text-bone md:text-[0.64rem]">
+              <span className="u-label u-label--tight block text-[0.56rem] tracking-[0.38em] text-bone md:text-[0.6rem]">
                 FAITH OVER FEAR
               </span>
-              <span className="u-label u-label--tight block text-[0.58rem] text-bone/45 md:text-[0.64rem]">
-                RW · KIGALI
+              <span className="u-label u-label--tight block text-[0.56rem] tracking-[0.32em] text-bone/40 md:text-[0.6rem]">
+                RW — KIGALI
               </span>
             </span>
           </a>
 
-          {/* ---- desktop links ---- */}
-          <div className="hidden items-center gap-9 md:flex">
+          {/* Desktop — restrained, premium */}
+          <div className="hidden items-center gap-8 md:flex">
             {site.nav.links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="link-underline u-label u-label--tight text-bone/65 transition-colors duration-300 hover:text-bone"
+                className="link-underline u-label u-label--tight text-bone/55 transition-colors duration-300 hover:text-bone"
               >
                 {link.label}
               </a>
             ))}
-            <a className="btn-outline !px-6 !py-2.5" href={site.nav.shop.href}>
+            <a
+              className="btn-solid !px-6 !py-[11px] !text-[0.62rem] tracking-[0.28em]"
+              href={site.nav.shop.href}
+              aria-label="Shop the collection — opens storefront"
+            >
               {site.nav.shop.label}
             </a>
           </div>
 
-          {/* ---- mobile trigger ---- */}
+          {/* Mobile */}
           <div className="flex items-center gap-3 md:hidden">
-            <a className="btn-outline !px-4 !py-2" href={site.nav.shop.href}>
+            <a className="btn-solid !px-4 !py-2 !text-[0.6rem]" href={site.nav.shop.href} aria-label="Shop">
               {site.nav.shop.label}
             </a>
             <button
               type="button"
-              className="flex h-10 w-10 flex-col items-center justify-center gap-[6px] border border-bone/25 text-bone"
+              className="flex h-10 w-10 flex-col items-center justify-center gap-[6px] border border-bone/18 bg-bone/[0.04] backdrop-blur text-bone transition-colors hover:bg-bone/10"
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? 'Close menu' : 'Open menu'}
@@ -123,50 +119,46 @@ export default function SiteNavigation() {
         </nav>
       </header>
 
-      {/* ---- mobile sheet ---- */}
+      {/* Mobile sheet — stone-like, heavy */}
       <div
         id="mobile-menu"
         className={cx(
-          'fixed inset-0 z-40 bg-ink/97 backdrop-blur-xl transition-opacity duration-500 md:hidden',
+          'fixed inset-0 z-40 bg-ink/[0.96] backdrop-blur-[22px] transition-all duration-700 ease-editorial md:hidden',
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
         aria-hidden={!open}
       >
         <div className="flex h-full flex-col justify-center u-fluid-gutter">
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {site.nav.links.map((link, i) => (
-              <li key={link.href} style={{ transitionDelay: `${120 + i * 70}ms` }}>
+              <li key={link.href} style={{ transitionDelay: `${100 + i * 60}ms` }}>
                 <a
                   href={link.href}
                   onClick={() => setOpen(false)}
                   tabIndex={open ? 0 : -1}
-                  className="u-headline block py-2 text-[clamp(2rem,11vw,3.25rem)] text-bone"
+                  className="u-display block py-3 text-[clamp(2.2rem,11vw,3.4rem)] tracking-tight text-bone/95 transition-colors hover:text-bone"
                 >
                   {link.label}
                 </a>
               </li>
             ))}
-            <li style={{ transitionDelay: `${120 + site.nav.links.length * 70}ms` }}>
+            <li style={{ transitionDelay: `${100 + site.nav.links.length * 60}ms` }}>
               <a
                 href={site.nav.shop.href}
                 onClick={() => setOpen(false)}
                 tabIndex={open ? 0 : -1}
-                className="u-headline block py-2 text-[clamp(2rem,11vw,3.25rem)] text-ember"
+                className="u-display block py-3 text-[clamp(2.2rem,11vw,3.4rem)] text-white"
               >
-                {site.nav.shop.label}
+                {site.nav.shop.label} —
               </a>
             </li>
           </ul>
 
-          <div className="mt-14 space-y-2 border-t border-bone/12 pt-6">
-            <a
-              className="u-label u-label--tight block text-bone/60"
-              href={`mailto:${site.contact.email}`}
-              tabIndex={open ? 0 : -1}
-            >
+          <div className="mt-16 space-y-3 border-t border-bone/[0.08] pt-7">
+            <a className="u-label u-label--tight block text-bone/50 hover:text-bone" href={`mailto:${site.contact.email}`} tabIndex={open ? 0 : -1}>
               {site.contact.email}
             </a>
-            <div className="flex gap-5">
+            <div className="flex gap-6">
               {site.contact.socials.map((s) => (
                 <a
                   key={s.href}
@@ -174,7 +166,7 @@ export default function SiteNavigation() {
                   target="_blank"
                   rel="noreferrer noopener"
                   tabIndex={open ? 0 : -1}
-                  className="u-label u-label--tight text-bone/60 hover:text-bone"
+                  className="u-label u-label--tight text-bone/45 hover:text-bone"
                 >
                   {s.label}
                 </a>

@@ -1,33 +1,27 @@
-# FAITH OVER FEAR RW — landing experience
+# FAITH OVER FEAR RW — Monolithic Minimalism landing
 
-An immersive, production landing page for **FAITH OVER FEAR RW**, the faith-inspired
-streetwear brand from Kigali, Rwanda.
+An immersive, production landing page for **FAITH OVER FEAR RW**, faith-inspired streetwear from **Kigali, Rwanda**.
 
-The signature moment is the hero: a monumental, hand-built **`F > F`** mark floating in
-front of a figure that stands *behind* it, with the head clearing the mark and the
-shoulder line screened back *over* the letterforms so the body genuinely wraps the
-symbol — volumetric haze, film grain and a controlled scroll dive into the collection.
+**Creative direction:** Monolithic Minimalism + Architectural Sculptural Mark (Concept C × Concept E) — monumental F–Human–F emblem, restrained metallic/stone materials, cinematic studio lighting, luxury editorial minimalism.
 
-Live reference brand site: <https://faithoverfearrw.netlify.app/>
+The signature hero: a hand-built **`F > F`** mark floating in front of a figure that stands *behind* it, head clearing the mark, shoulders screened back *over* the letterforms so the body genuinely wraps the symbol — volumetric haze, film grain, controlled scroll dive.
+
+Live reference: https://faithoverfearrw.netlify.app/
 
 ---
 
 ## Stack
 
-| Concern         | Choice                                                            |
-| --------------- | ----------------------------------------------------------------- |
-| Framework       | React 18 + TypeScript + Vite                                       |
-| Styling         | Tailwind CSS (custom editorial tokens, no component library)        |
-| Motion          | GSAP + ScrollTrigger (scrub-linked, never scroll-hijacked)          |
-| Atmosphere      | Hand-written WebGL2 fragment shader (≈120 lines, no 3D dependency)  |
-| Fonts           | Self-hosted via `@fontsource` (Anton, Archivo Variable, Inter, Space Mono) |
+| Concern | Choice |
+| ------- | ------ |
+| Framework | React 18 + TypeScript + Vite |
+| Styling | Tailwind CSS (monolithic tokens: graphite #0A0A0A / white #FFFFFF / off-white #F5F5F7 / industrial grey #7E7E80) |
+| Motion | GSAP + ScrollTrigger (scrub-linked, never hijacked) |
+| 3D | Three.js + React Three Fiber + drei (optional extruded F>F, studio lights) + SVG sculpture fallback |
+| Atmosphere | Hand-written WebGL fragment shader + Canvas fallback |
+| Fonts | Self-hosted via `@fontsource` (Anton / Archivo Variable / Inter / Space Mono) |
 
-**No Three.js / React Three Fiber.** The brief allows it, but the composition is a
-2.5D art-directed composite: a real dimensional effect (layered bevel, cast shadow,
-specular sweep, pointer-responsive tilt, parallax plates) is achieved with SVG + CSS 3D
-+ WebGL haze at a fraction of the weight, with a guaranteed fallback. Adding a
-multi-megabyte GLB human model would have made the first screen slower and *less*
-reliable, and no licensable model was available to bundle.
+**2.5D + optional 3D:** The primary emblem is SVG sculpture (bloom → 10-step extruded bevel → brushed-titanium face → stone gradient → AO → chamfer → rim light → specular sweep) with CSS 3D perspective + pointer tilt. On capable desktops `HeroSceneCanvas` loads a real Three.js extrusion behind it; on mobile/reduced-motion/save-data the SVG composite is the hero — never empty, never slow.
 
 ---
 
@@ -36,158 +30,121 @@ reliable, and no licensable model was available to bundle.
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run build      # tsc --noEmit && vite build  → dist/
+npm run build      # tsc --noEmit && vite build → dist/
 npm run preview
 ```
 
 ### Tests
 
 ```bash
-node scripts/smoke.mjs              # full page boots in jsdom, 23 assertions
-node scripts/test-hero-modes.mjs image   # MODE B — still imagery
-node scripts/test-hero-modes.mjs video   # MODE A — local video + failure fallback
+node scripts/smoke.mjs                         # 23 assertions
+node scripts/test-hero-modes.mjs image          # MODE B still
+node scripts/test-hero-modes.mjs video          # MODE A video + fallback
 ```
 
 ---
 
-## Hero media: one switch, two modes
+## Hero media: one switch
 
 `src/config/site.ts` → `heroMedia`
 
 ```ts
 heroMedia.type = 'image';   // or 'video'
+heroMedia.type = 'video';   // VITE_HERO_TYPE=video npm run build also works
 ```
 
-* **MODE A — `video`**: local cinematic loop (`/media/hero-motion.webm` + `.mp4`),
-  muted, `playsInline`, poster-backed. If the file is missing or undecodable the hero
-  silently swaps to the still — it is never empty.
-* **MODE B — `image`**: high-resolution still with responsive `srcSet` (WebP + JPEG
-  at 1280/1920), plus CSS/WebGL depth, parallax and the interlace plate.
+- **MODE A video:** local cinematic loop (`/media/hero-motion.webm` + `.mp4`), muted, playsInline, poster-backed. If missing/undecodable → still.
+- **MODE B image:** high-res still with WebP/JPEG at 1280/1920, srcSet, depth treatment, interlace plate.
 
-Both modes can also be chosen at build time without editing source:
+`prefers-reduced-motion: reduce` forces image mode (no autoplay).
 
-```bash
-VITE_HERO_TYPE=video npm run build
+### Composition
+
+| Key | Meaning |
+| --- | ------- |
+| `focusX/Y` | object-position of figure inside frame |
+| `scale` | depth push of figure plate |
+| `markCenterY` | vertical centre of F>F, % hero height |
+| `markWidthVw` | width of mark, % viewport |
+
+Mobile **re-composes**, not shrinks — `index.css` re-stages scale/shift/focus/mark at `max-width:767px` plus short-viewport guards.
+
+### Cinematic opening (research report sequence)
+
+```
+0.0–0.5s  Atmosphere — deep graphite wash fades in
+0.5–1.2s  Frame — SVG stroke-dash draws the rectangular border
+1.0–2.0s  Sculptural Fs — scale + depth + rim light emerge
+1.5–2.5s  Human — interlace plate + rim lighting reveal
+2.0–3.0s  Settle — headline lines stagger into place
 ```
 
-`prefers-reduced-motion: reduce` forces MODE B (no autoplay) everywhere.
-
-### Composition controls
-
-Everything about the staging lives in `heroMedia.composition`:
-
-| Key                | Meaning                                                     |
-| ------------------ | ----------------------------------------------------------- |
-| `focusX` / `focusY`| `object-position` of the figure inside the hero frame        |
-| `scale`            | depth push applied to the figure plate                       |
-| `markCenterY`      | vertical centre of the `F > F` mark, % of hero height        |
-| `markWidthVw`      | mark width, % of viewport width (desktop / mobile)           |
-
-Mobile **re-composes** rather than shrinks: `index.css` re-stages the figure scale,
-shift, focus and mark size at `max-width: 767px`, plus short-viewport guards that keep
-the mark clear of the headline.
+All timings are GSAP; reduced-motion skips to final state. The hero never traps navigation — 2.8s hard ceiling + veil fallback.
 
 ---
 
-## Layering (z-index → purpose)
+## Layering (z → purpose)
 
 | z | Layer |
 | - | ----- |
-| 0 | `.hero-wash` — always-on atmospheric gradient (works without JS/WebGL) |
-| 1 | back figure plate — body standing **behind** the mark |
-| 3 | `F > F` mark — bloom → extruded bevel → smoked-glass face → chamfer → rim light → specular sweep |
-| 4 | interlace plate — same frame, `mix-blend-mode: screen`, masked to the shoulder band |
+| 0 | `.hero-wash` — graphite atmospheric wash |
+| 1 | back figure plate — body **behind** mark |
+| 3 | F>F mark — SVG sculpture + optional Three.js extrusion |
+| 4 | interlace plate — same frame, `mix-blend-mode: screen`, shoulder-band mask |
 | 5 | WebGL volumetric haze (additive) |
 | 6 | film grain |
 | 7 | vignette |
-| 8 | the frame from the original sketch, with corner ticks |
-| 9 | eyebrow, headline, CTAs, scroll cue |
+| 8 | frame from sketch (SVG rect + corner ticks) |
+| 9 | eyebrow, headline `WALK BY FAITH. LIVE WITH COURAGE.`, CTAs (`SHOP THE COLLECTION` / `OUR PURPOSE`), scroll cue |
 
-> The interlace plate must stay a **direct child** of `.hero-stage`. Any wrapper that
-> forms an isolated group (`z-index`, `will-change`, `opacity`, `transform`) severs the
-> blend from the mark underneath.
+> Interlace & haze must be **direct children** of `.hero-stage` — isolated wrappers break the blend.
+
+---
+
+## 3D — Three.js enhancement
+
+- `src/components/HeroScene.tsx` — capability check (WebGL, DPR ≤2.8, desktop ≥1024px, no save-data, no reduced-motion) then lazy-loads `HeroSceneCanvas.tsx`
+- `HeroSceneCanvas.tsx` — Three.js: hand-built F shapes as `THREE.Shape` → `Extrude` with bevel, metalness 0.72, roughness 0.28, studio lights (key + rim + fill), contact shadows, fog
+- Fallback is always the SVG sculpture — the page is never dependent on a GLB
+
+**Optional GLB:** `public/media/f-human-f.glb` (GLB ≤1.2 MB, Draco, F meshes + chevron + frame, PBR). Documented in `public/media/README.md`; if absent the site is complete with SVG.
 
 ---
 
 ## Authentic brand data
 
-All content is the brand's own, pulled from the live storefront:
-
-* **Products** — names, descriptions, prices (FRW), colours, sizes and Cloudinary
-  photography come from `https://faithoverfearrw.netlify.app/api/products`. A verified
-  snapshot lives in `src/data/products.ts` so the page always renders; at runtime
-  `useCatalog()` refreshes from the live API and falls back silently on any failure
-  (offline, CORS, timeout).
-* **Copy** — `Our Conviction`, `The Quality`, `The Stand`, the ABIDE and GENESIS drop
-  descriptions and all contact details are taken verbatim from the brand's About,
-  Contact and drops pages.
-* **Shopping** — every CTA and product card links to the real, functioning storefront
-  (`/shop`). No checkout is invented.
-* **Nothing is fabricated** — no invented prices, stock counts, reviews, discounts,
-  testimonials, founders, history or policy pages.
+- **Products:** names, descriptions, prices (FRW), colours, sizes, Cloudinary photography from `https://faithoverfearrw.netlify.app/api/products`. Snapshot in `src/data/products.ts`; runtime `useCatalog()` refreshes live, falls back on offline/CORS/timeout.
+- **Copy:** Our Conviction / The Quality / The Stand, ABIDE/GENESIS descriptions, contact — verbatim from brand's About/Contact/drops.
+- **Shopping:** every CTA → real storefront (`/shop`). No checkout invented.
+- **Nothing fabricated:** no invented prices, stock, reviews, discounts, testimonials, founders.
 
 ---
 
 ## Performance & accessibility
 
-* Fonts self-hosted and subsetted by `unicode-range`; no third-party font CDN.
-* Hero still: WebP + JPEG at two widths, `sizes` + `srcSet`, preloaded.
-* Below-fold imagery is `loading="lazy"`; product art is served through Cloudinary
-  `f_auto,q_auto`.
-* The WebGL haze is capped at DPR 1.35, renders one static frame under reduced motion,
-  and stops on `visibilitychange`.
-* Hero video (MODE A) pauses when the hero scrolls out of view or the tab is hidden.
-* `prefers-reduced-motion` disables the intro timeline, scrubs, parallax, the specular
-  sweep, the grain drift and video autoplay.
-* Semantic landmarks, one `<h1>`, skip link, visible `:focus-visible` rings, keyboard
-  operable mobile menu (Escape closes), decorative plates `aria-hidden`, the brand mark
-  exposed as `role="img"` with a text label, no autoplay audio, no flashing.
-* No scroll hijacking — every effect is scrub-linked to native scrolling.
+- Self-hosted subsetted fonts; no CDN
+- Hero still WebP+JPEG, responsive `srcSet`+`sizes`, preloaded; below-fold `loading="lazy"`; Cloudinary `f_auto,q_auto`
+- WebGL haze DPR cap 1.35, single static frame on reduced-motion, stops on `visibilitychange`
+- Video pauses when hero out of view or tab hidden
+- `prefers-reduced-motion` disables intro, scrubs, parallax, sheen, grain, autoplay
+- Semantic landmarks, one `<h1>`, skip link, visible focus rings, Esc-closes mobile menu, decorative plates `aria-hidden`, mark `role="img"` with label, no audio/flashing
+- No scroll hijacking — scrub-linked only
 
-### First screen without JS / WebGL / video
-
-`index.html` paints a branded loading state (poster plate + wordmark + progress rule)
-immediately and removes it once React reports the first hero frame. `<noscript>` renders
-the full headline, the brand statement, the real contact details and a working
-SHOP link.
+**No-JS:** `index.html` paints poster-plate + veil; `<noscript>` renders headline, brand statement, contact, SHOP link.
 
 ---
 
-## Media assets (`public/media/`)
+## Responsive
 
-| File | Purpose |
-| ---- | ------- |
-| `hero-figure-1920.{jpg,webp}` | hero still, wide |
-| `hero-figure-1280.{jpg,webp}` | hero still, small screens / save-data |
-| `hero-poster.jpg` | video poster + OG/no-JS fallback |
-| `hero-motion.{webm,mp4}` | MODE A cinematic loop (9 s, 720p, ≈300 kbps) |
-| `og-cover.jpg` | 1200×630 social card |
-| `favicon.svg` | `F > F` favicon |
-
-### Provenance of the figure plate
-
-The repository shipped with **no** brand photography, so the hero figure plate
-(`hero-figure-*`, `hero-poster`, `hero-motion.*`) was **art-directed and generated for
-this campaign** — backlit, near-black, monochrome, graded to the brand palette, then
-denoised and looped with a slow Ken-Burns drift for MODE A. It is a stand-in for real
-campaign photography, and it is the one asset that is not the brand's own.
-
-**Swapping in real photography** requires no code changes — drop the files in using the
-same names, then re-tune `heroMedia.composition` (`focusX` / `focusY` / `scale` /
-`markCenterY`) so the head clears the mark and the shoulders cross it. The calibration
-method used here is in `scripts/README.md`.
-
-All *product* and *campaign* imagery is the brand's real Cloudinary photography, loaded
-responsively through `f_auto,q_auto`.
+- Desktop: full cinematic scene, monumentality, pointer tilt
+- Tablet: frame/camera/text re-tuned to prevent collisions
+- Mobile: recomposed F–Human–F (mark 68vw, figure 50/34), legible `WALK BY FAITH. LIVE WITH COURAGE.`, touch-friendly cards, reduced effects, no cursor interactions, no overflow
 
 ---
 
 ## Deployment (Netlify)
 
-`netlify.toml` sets the build (`npm run build` → `dist`), Node 20, immutable caching for
-hashed `/assets/*` and `/media/*`, and baseline security headers. Publishing is a
-standard Netlify deploy from this repository; `npm run build` must pass (it runs
-`tsc --noEmit` first).
+`netlify.toml`: `npm run build` → `dist`, Node 20, immutable `/assets/*` + `/media/*` caching, security headers. `npm run build` must pass (`tsc --noEmit` first).
 
 ---
 
@@ -195,22 +152,53 @@ standard Netlify deploy from this repository; `npm run build` must pass (it runs
 
 ```
 src/
-  config/site.ts          brand copy, links, hero media + composition config
-  data/products.ts        verified catalogue snapshot + Cloudinary helper
-  data/useCatalog.ts      live catalogue refresh with silent fallback
-  hooks/                  media queries, page visibility, parallax
+  config/site.ts            brand copy, links, heroMedia + composition
+  data/products.ts          verified catalogue snapshot + Cloudinary helper
+  data/useCatalog.ts        live refresh with silent fallback
+  hooks/                    media queries, parallax
   components/
-    SiteNavigation.tsx    wordmark, links, SHOP, mobile sheet
-    HeroSection.tsx       layer orchestration, intro + scroll choreography
-    HeroMedia.tsx         MODE A / MODE B plates + fallback
-    BrandSymbol.tsx       the hand-built F > F mark (SVG)
-    AtmosphereCanvas.tsx  WebGL volumetric haze
-    BrandStatement.tsx    declaration
-    ProductShowcase.tsx   editorial product grid
-    ProductCard.tsx       product card
-    CampaignSection.tsx   ABIDE / GENESIS campaign plates
-    BrandStory.tsx        brand purpose
-    CollectionCTA.tsx     final invitation
-    SiteFooter.tsx        identity, contact, verified links
-    Reveal.tsx            one-shot scroll reveal
+    SiteNavigation.tsx      wordmark, SHOP, mobile sheet
+    HeroSection.tsx         layer orchestration + cinematic intro + scroll dive
+    HeroMedia.tsx           MODE A/B plates + fallback
+    BrandSymbol.tsx         hand-built F>F SVG sculpture (Concept C×E)
+    SculpturalFMark.tsx     alias re-export
+    BrandFrame.tsx          rectangular frame with stroke-dash reveal
+    HumanFigure.tsx         figure wrapper (rim + contact)
+    HeroScene.tsx           capability-gated 3D orchestrator
+    HeroSceneCanvas.tsx     Three.js extruded Fs + studio lighting
+    HeroMediaFallback.tsx   static fallback
+    AtmosphereCanvas.tsx    WebGL volumetric haze
+    BrandStatement.tsx      FAITH OVER FEAR IS NOT A LABEL...
+    ProductShowcase.tsx     FeaturedCollection — editorial grid
+    ProductCard.tsx         card with Cloudinary + hover + availability
+    CampaignSection.tsx     ABIDE / GENESIS large-format plates
+    BrandStory.tsx          WE CREATE ARMOUR FOR THE BOLD
+    CollectionCTA.tsx       WEAR YOUR CONVICTION.
+    SiteFooter.tsx          identity, verified links, contact
+    ShoppingInterface.tsx   honest commerce bridge (no fake checkout)
+    Reveal.tsx              one-shot scroll reveal
 ```
+
+---
+
+## Media assets (`public/media/`)
+
+| File | Purpose |
+| ---- | ------- |
+| `hero-figure-1920.{jpg,webp}` | wide still |
+| `hero-figure-1280.{jpg,webp}` | small still |
+| `hero-poster.jpg` | poster + veil + OG |
+| `hero-motion.{webm,mp4}` | MODE A loop |
+| `og-cover.jpg` | 1200×630 social card |
+| `favicon.svg` | F>F favicon |
+
+Figure plate is generated stand-in (no brand photography shipped). Swap with brand's campaign shoot, same names, re-tune `heroMedia.composition`. See `public/media/README.md` & `scripts/README.md`.
+
+---
+
+## Design tokens — Monolithic Minimalism
+
+- Deep graphite #0A0A0A · Pure white #FFFFFF · Off-white #F5F5F7 · Industrial grey #7E7E80
+- Materials: brushed titanium, dark stone, matte rubber, heavy cotton, restrained metal
+- Type: Anton (display, condensed architectural) + Archivo Variable (headline) + Inter (body)
+- Motion: purposeful, sequenced, never simultaneous; `ease-editorial` cubic-bezier(0.16,1,0.3,1)
