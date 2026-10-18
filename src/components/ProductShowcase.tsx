@@ -87,7 +87,7 @@ export default function ProductShowcase({ products, live }: Props) {
         </div>
 
         <Reveal className="mt-20 flex flex-wrap items-center gap-6 md:mt-24">
-          <a className="btn-solid" href={site.nav.shop.href}>
+          <a className="btn-solid" href="/shop">
             {site.collection.cta}
           </a>
           <p className="u-label u-label--tight text-bone/35">
